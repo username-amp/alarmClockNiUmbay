@@ -8,6 +8,7 @@ import ForgotPassScreen from './screens/ForgotPassScreen'; // Import ForgotPassS
 import HomePageScreen from './screens/HomePageScreen'; // Import HomePageScreen
 import ClockPageScreen from './screens/ClockPageScreen'; // Import ClockPageScreen
 import StopWatchScreen from './screens/StopWatchScreen';
+import TimerScreen from './screens/TimerPageScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +49,11 @@ const App = () => {
         <Stack.Screen
           name="StopwatchPage"
           component={StopWatchScreen}
+          options={{ headerShown: false }}
+        />
+         <Stack.Screen
+          name="TimerPage"
+          component={TimerScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

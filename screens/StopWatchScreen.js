@@ -64,7 +64,7 @@ const StopwatchScreen = ({ navigation }) => {
 
       {/* Bottom Navigation Bar */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('HomePage')}>
           <Icon name="alarm-outline" size={24} color="#888" />
           <Text style={styles.navText}>Alarm</Text>
         </TouchableOpacity>
@@ -76,8 +76,8 @@ const StopwatchScreen = ({ navigation }) => {
           <Icon name="stopwatch-outline" size={24} color="#ED2938" />
           <Text style={styles.navText}>Stopwatch</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Icon name="timer-outline" size={24} color="#888" />
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('TimerPage')}>
+          <Icon name="stopwatch-outline" size={24} color="#888" />
           <Text style={styles.navText}>Timer</Text>
         </TouchableOpacity>
       </View>

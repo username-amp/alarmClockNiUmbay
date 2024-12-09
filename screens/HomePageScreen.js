@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,16 @@ const HomePageScreen = ({ navigation }) => {
   const [newRepeat, setNewRepeat] = useState('Once');
   const [newLabel, setNewLabel] = useState('');
   const [newRingtone, setNewRingtone] = useState('');
+
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Function to update the current time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, []);
 
   const addAlarm = () => {
     if (newTime.trim() === '') return;
@@ -63,17 +73,61 @@ const HomePageScreen = ({ navigation }) => {
               )
             );
           }}
+          trackColor={{ false: '#B0B0B0', true: '#4CAF50' }} // Green for enabled, gray for disabled
         />
       </View>
     </View>
   );
 
+  // Calculate remaining time for the alarm
+  const calculateRemainingTime = (alarmTime) => {
+    const alarmDate = new Date();
+    const [time, period] = alarmTime.split(' ');
+
+    let [hours, minutes] = time.split(':');
+    if (period === 'PM' && hours !== '12') hours = (parseInt(hours) + 12).toString();
+    if (period === 'AM' && hours === '12') hours = '0';
+
+    alarmDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+    const remainingTime = alarmDate - currentTime;
+
+    // If the remaining time is less than 0, it means the alarm has passed today and should trigger the next day.
+    if (remainingTime <= 0) {
+      alarmDate.setDate(alarmDate.getDate() + 1); // Set the alarm for the next day
+    }
+
+    const remainingMillis = alarmDate - currentTime;
+
+    // Check if the remaining time is less than a second to trigger the alarm
+    if (remainingMillis <= 1000 && remainingMillis > 0) {
+      triggerAlarm(alarmTime); // Trigger the alarm when time is up
+    }
+
+    const remainingDays = Math.floor(remainingMillis / (1000 * 60 * 60 * 24));
+    const remainingHours = Math.floor((remainingMillis % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const remainingMinutes = Math.floor((remainingMillis % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `Ring in ${remainingDays} days ${remainingHours} hours ${remainingMinutes} minutes.`;
+  };
+
+  // Trigger the alarm when the time matches
+  const triggerAlarm = (alarmTime) => {
+    console.log(`Alarm triggered for ${alarmTime}`);
+    // You can add sound or vibration here as well
+    // For now, we'll just log it as an example
+  };
+
   return (
     <View style={styles.container}>
       {/* Placeholder for Time */}
       <View style={styles.timePlaceholder}>
-        <Text style={styles.placeholderText}>10:56:55 PM</Text>
-        <Text style={styles.placeholder}>Ring in 2 days 7 hours 30 minutes.</Text>
+        <Text style={styles.placeholderText}>
+          {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+        </Text>
+        <Text style={styles.remainingTime}>
+          {calculateRemainingTime('6:00 AM')} {/* Example for testing */}
+        </Text>
       </View>
 
       {/* Alarms Section */}
@@ -174,7 +228,10 @@ const HomePageScreen = ({ navigation }) => {
           <Icon name="stopwatch-outline" size={24} color="#888" />
           <Text style={styles.navText}>Stopwatch</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate('TimerPage')}
+        >
           <Icon name="timer-outline" size={24} color="#888" />
           <Text style={styles.navText}>Timer</Text>
         </TouchableOpacity>
@@ -198,8 +255,10 @@ const styles = StyleSheet.create({
     color: '#FFF',
     paddingBottom: 5,
   },
-  placeholder: {
+  remainingTime: {
+    fontSize: 14,
     color: '#FFF',
+    marginTop: 5,
   },
   alarmsSection: {
     flex: 1,
@@ -209,32 +268,40 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   card: {
-    backgroundColor: '#333',
-    borderRadius: 10,
+    backgroundColor: '#222', 
+    borderRadius: 15,
     padding: 15,
-    marginVertical: 10,
+    marginVertical: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 70,
+    height: 80,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
   },
   textContainer: {
     flex: 1,
-    justifyContent: 'center',
   },
   time: {
-    fontSize: 20,
+    fontSize: 22,
     color: '#FFF',
     fontWeight: 'bold',
-    paddingBottom: 5,
+  },
+  repeatLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   repeat: {
     fontSize: 14,
-    color: '#888',
+    color: '#B0B0B0',
   },
   label: {
     fontSize: 14,
-    color: '#888',
+    color: '#B0B0B0',
+    marginLeft: 5,
   },
   switchContainer: {
     justifyContent: 'center',
