@@ -1,7 +1,32 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 const ForgotPassScreen = ({ navigation }) => {
+  const [email, setEmail] = useState("");
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email address.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert("Success", "Password reset email sent!");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Forgot Password</Text>
@@ -14,9 +39,11 @@ const ForgotPassScreen = ({ navigation }) => {
         placeholder="Email"
         placeholderTextColor="#888"
         keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
         <Text style={styles.buttonText}>Send Reset Link</Text>
       </TouchableOpacity>
 
@@ -30,27 +57,27 @@ const ForgotPassScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#101820FF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#101820FF",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
-    color: '#ED2938',
-    fontWeight: 'bold',
+    color: "#ED2938",
+    fontWeight: "bold",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#FFF',
+    color: "#FFF",
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
-    width: '100%',
-    backgroundColor: '#333333',
-    color: '#FFF',
+    width: "100%",
+    backgroundColor: "#333333",
+    color: "#FFF",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -58,22 +85,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#ED2938',
+    backgroundColor: "#ED2938",
     paddingVertical: 15,
     borderRadius: 20,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
-    width: '100%',
+    width: "100%",
   },
   buttonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   backText: {
-    color: '#ED2938',
+    color: "#ED2938",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

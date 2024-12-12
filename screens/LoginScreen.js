@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,22 +6,34 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-} from 'react-native';
+  Alert,
+} from "react-native";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 const LoginScreen = ({ navigation }) => {
-  const handleLogin = () => {
-    // Add your authentication logic here
-    // If authentication is successful, navigate to HomePageScreen
-    navigation.navigate('HomePage');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in both fields.");
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert("Success", "Logged in successfully!");
+      navigation.navigate("HomePage");
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Clock Image */}
-      <Image
-        source={require('../assets/logo.png')}
-        style={styles.image}
-      />
+      <Image source={require("../assets/logo.png")} style={styles.image} />
 
       {/* App Title */}
       <Text style={styles.title}>W A K E</Text>
@@ -33,12 +45,17 @@ const LoginScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Email"
           placeholderTextColor="#888"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
           placeholderTextColor="#888"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
 
@@ -50,17 +67,17 @@ const LoginScreen = ({ navigation }) => {
       {/* Forgot Password Button */}
       <TouchableOpacity
         style={styles.forgotButton}
-        onPress={() => navigation.navigate('ForgotPassword')} // Navigate to ForgotPassScreen
+        onPress={() => navigation.navigate("ForgotPassword")}
       >
         <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
 
       {/* Register Text */}
       <Text style={styles.registerText}>
-        You Don’t Have an Account?{' '}
+        You Don’t Have an Account?{" "}
         <Text
           style={styles.registerLink}
-          onPress={() => navigation.navigate('Register')} // Navigate to RegisterScreen
+          onPress={() => navigation.navigate("Register")}
         >
           Register
         </Text>
@@ -72,9 +89,9 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#101820FF',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#101820FF",
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   image: {
@@ -84,21 +101,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#ED2938',
+    fontWeight: "bold",
+    color: "#ED2938",
     marginBottom: 5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#FFF',
+    color: "#FFF",
     marginBottom: 70,
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
   },
   input: {
-    backgroundColor: '#333333',
-    color: '#FFF',
+    backgroundColor: "#333333",
+    color: "#FFF",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -106,34 +123,34 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   loginButton: {
-    backgroundColor: '#ED2938',
+    backgroundColor: "#ED2938",
     paddingVertical: 15,
     borderRadius: 20,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
-    width: '100%',
+    width: "100%",
   },
   buttonText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   forgotButton: {
     marginVertical: 10,
   },
   forgotText: {
-    color: '#ED2938',
+    color: "#ED2938",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
     marginBottom: 80,
   },
   registerLink: {
-    color: '#ED2938',
-    fontWeight: 'bold',
+    color: "#ED2938",
+    fontWeight: "bold",
   },
 });
 
